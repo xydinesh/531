@@ -1,3 +1,13 @@
 from django.shortcuts import render
 
-# Create your views here.
+from .models import (
+    TrainingMax
+)
+
+def tm(request):
+    tm = TrainingMax.objects.first()
+    data = {
+        'tm': tm,
+    }
+    return render(request, 'bbb/index.html', data)
+

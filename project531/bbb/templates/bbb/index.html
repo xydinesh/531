@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="bbb">
+  <div class="jumbotron jumbotron-fluid">
+    <div class="container">
+      <h1 class="display-4">{{ org.name }}</h1>
+      <p class="lead"></p>
+    </div>
+  </div>
+
+  <div class="bg-white container">
+    <!-- Content -->
+    <tm-item></tm-item>
+  </div>
+</div>
+
+<!-- Vue -->
+<template id="tm-template">
+  <div class="tm-item">
+    <table class="table table-striped">
+      <thead>
+	<tr>
+	  <th scope="col"></th>	  
+	  <th scope="col">Squat</th>
+	  <th scope="col">Deadlift</th>
+	  <th scope="col">Bench Press</th>
+	  <th scope="col">Overhead Press</th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr>
+	  <th scope="row">{{ tm.record_date }}</th>
+	  <td>{{ tm.squat }}</td>
+	  <td>{{ tm.deadlift }}</td>
+	  <td>{{ tm.bench_press }}</td>
+	  <td>{{ tm.overhead_press }}</td>
+	</tr>
+      </tbody>
+    </table>
+</template>
+
+<script>
+  TmItem = Vue.component('tm-item', {
+      template: '#tm-template'
+  });
+
+  const tmapp = new Vue({}).$mount('#bbb');
+</script>
+{% endblock %}
+
