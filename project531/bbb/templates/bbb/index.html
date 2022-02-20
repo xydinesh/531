@@ -3,7 +3,7 @@
 <div id="bbb">
   <div class="jumbotron jumbotron-fluid">
     <div class="container">
-      <h1 class="display-4">{{ org.name }}</h1>
+      <h1 class="display-4">BBB Program</h1>
       <p class="lead"></p>
     </div>
   </div>
@@ -11,13 +11,14 @@
   <div class="bg-white container">
     <!-- Content -->
     <tm-item></tm-item>
+    <week-list></week-list>
   </div>
 </div>
 
 <!-- Vue -->
 <template id="tm-template">
   <div class="tm-item">
-    <table class="table table-striped">
+    <table class="table table-striped my-5">
       <thead>
 	<tr>
 	  <th scope="col"></th>	  
@@ -29,20 +30,148 @@
       </thead>
       <tbody>
 	<tr>
-	  <th scope="row">{{ tm.record_date }}</th>
-	  <td>{{ tm.squat }}</td>
-	  <td>{{ tm.deadlift }}</td>
-	  <td>{{ tm.bench_press }}</td>
-	  <td>{{ tm.overhead_press }}</td>
+	  <th scope="row">[[ tm.record_date ]]</th>
+	  <td>[[ tm.squat ]]</td>
+	  <td>[[ tm.deadlift ]]</td>
+	  <td>[[ tm.bench_press ]]</td>
+	  <td>[[ tm.overhead_press ]]</td>
 	</tr>
       </tbody>
     </table>
 </template>
 
+<!-- Week List template -->
+<template id="week-list-template">
+  <div class="week-list">
+    <week-item :week=1 :h=50 :i=65 :j=75 :k=85 :reps=5></week-item>
+    <week-item :week=2 :h=50 :i=70 :j=80 :k=90 :reps=3></week-item>
+    <week-item :week=3 :h=50 :i=75 :j=85 :k=95 :reps=1></week-item>
+    <week-item :week=4 :h=60 :i=65 :j=75 :k=85 :reps=5></week-item>
+    <week-item :week=5 :h=60 :i=70 :j=80 :k=90 :reps=3></week-item>
+    <week-item :week=6 :h=60 :i=75 :j=85 :k=95 :reps=1></week-item>    
+    <week-item :week=7 :h=50 :i=40 :j=50 :k=60 :reps=5></week-item>       
+  </div>
+</template>
+
+
+<!-- Week template -->
+<template id="week-item-template">
+  <div class="week-item">
+    <table class="table my-5">
+      <thead class="thead-dark">
+	<tr>
+	  <th rowspan="4"></th>
+	  <th scope="col">Sunday</th>
+	  <th scope="col">Monday</th>
+	  <th scope="col">Tuesday</th>
+	  <th scope="col">Wednesday</th>
+	  <th scope="col">Thursday</th>
+	  <th scope="col">Friday</th>
+	  <th scope="col">Saturday</th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr>
+	  <td rowspan="5" class="vertical"> Week [[ week ]]</td>
+	  <td>Overhead Press 3x[[ reps ]]</td>
+	  <td></td>
+	  <td>Deadlift 3x[[ reps ]]</td>
+	  <td></td>
+	  <td>Bench Press 3x[[ reps ]]</td>
+	  <td>Squat 3x[[ reps ]]</td>
+	  <td></td>
+	</tr>
+	<tr>
+	  <td>[[ overhead_press(i) ]]-[[ overhead_press(j) ]]-[[ overhead_press(k)]]</td>
+	  <td></td>
+	  <td>[[ deadlift(i) ]]-[[ deadlift(j) ]]-[[ deadlift(k)]]</td>
+	  <td></td>
+	  <td>[[ bench_press(i) ]]-[[ bench_press(j) ]]-[[ bench_press(k)]]</td>	  
+	  <td>[[ squat(i) ]]-[[ squat(j) ]]-[[ squat(k)]]</td>	  
+	  <td></td>
+	</tr>
+	<tr>
+	  <td>Bench Press 5x10</td>
+	  <td></td>
+	  <td>Squat 5x10</td>
+	  <td></td>
+	  <td>Overhead Press 5x10</td>
+	  <td>Deadlift 5x10</td>
+	  <td></td>
+	</tr>
+	<tr>
+	  <td>[[ bench_press(h) ]]</td>
+	  <td></td>
+	  <td>[[ squat(h) ]]</td>
+	  <td></td>
+	  <td>[[ overhead_press(h) ]]</td>
+	  <td>[[ deadlift(h) ]]</td>
+	  <td></td>
+	</tr>
+	<tr>
+	  <td>Dips 3x10, Calf Raises 3x20, W.Pull Ups 5x10, Dumbell Row 5x10</td>
+	  <td></td>
+	  <td>Dips 3x10, Calf Raises 3x20, T2B 5x10, Reverse Extention 5x10</td>
+	  <td></td>
+	  <td>Dips 3x10, Calf Raises 3x20, W.Pull Ups 5x10, Dumbell Row 5x10</td>	  
+	  <td>Dips 3x10, Calf Raises 3x20, T2B 5x10, Reverse Extention 5x10</td>	  
+	  <td></td>
+      </tbody>
+    </table>
+  </div>
+</template>
+
 <script>
+  const store = new Vuex.Store({
+      state: {
+	  tm: {
+	      squat: '{{tm.squat}}',
+	      deadlift: '{{tm.deadlift}}',
+	      bench_press: '{{tm.bench_press}}',
+	      overhead_press: '{{tm.overhead_press}}',
+	      record_date: '{{tm.record_date}}',
+	  }
+      }
+  })
+  
   TmItem = Vue.component('tm-item', {
-      template: '#tm-template'
+      template: '#tm-template',
+      data() {
+	  return {
+	      tm: store.state.tm,
+	  };
+      },
+      delimiters: ['[[', ']]'],
   });
+
+  WeekList = Vue.component('week-list', {
+      template: '#week-list-template',
+  })
+  
+  WeekItem = Vue.component('week-item', {
+      template: '#week-item-template',
+      delimiters: ['[[', ']]'],
+      props: ['h', 'i', 'j', 'k', 'reps', 'week'],
+      data () {
+	  return {
+	      tm: store.state.tm,
+	  };
+      },
+      methods: {
+	  overhead_press(param) {
+	      return this.tm.overhead_press * param/100
+	  },
+	  bench_press(param) {
+	      return this.tm.bench_press * param/100
+	  },
+	  squat(param) {
+	      return this.tm.squat * param/100
+	  },
+	  deadlift(param) {
+	      return Math.ceil(this.tm.deadlift * param/100)
+	  },
+      }
+  })
 
   const tmapp = new Vue({}).$mount('#bbb');
 </script>
