@@ -10,14 +10,15 @@
 
   <div class="bg-white container">
     <!-- Content -->
-    <tm-item></tm-item>
-    <week-list></week-list>
+    <router-link to="/tm">TM</router-link>
+    <router-link to="/workout">Workout</router-link>
+    <router-view></router-view>
   </div>
 </div>
 
 <!-- Vue -->
-<template id="tm-template">
-  <div class="tm-item">
+<template id="tm-list-template">
+  <div class="tm-list">
     <table class="table table-striped my-5">
       <thead>
 	<tr>
@@ -29,15 +30,20 @@
 	</tr>
       </thead>
       <tbody>
-	<tr>
-	  <th scope="row">[[ tm.record_date ]]</th>
-	  <td>[[ tm.squat ]]</td>
-	  <td>[[ tm.deadlift ]]</td>
-	  <td>[[ tm.bench_press ]]</td>
-	  <td>[[ tm.overhead_press ]]</td>
-	</tr>
-      </tbody>
-    </table>
+	<tm-item v-for="(tm, i) in tms" :key="i" :tm="tm"></tm-item>
+      </tbody>    
+  </div>
+</template>
+
+<template id="tm-template">
+  <div class="tm-item">
+    <tr>
+      <th scope="row">[[ tm.record_date ]]</th>
+      <td>[[ tm.squat ]]</td>
+      <td>[[ tm.deadlift ]]</td>
+      <td>[[ tm.bench_press ]]</td>
+      <td>[[ tm.overhead_press ]]</td>
+    </tr>
 </template>
 
 <!-- Week List template -->
@@ -46,10 +52,10 @@
     <week-item :week=1 :h=50 :i=65 :j=75 :k=85 :reps=5></week-item>
     <week-item :week=2 :h=50 :i=70 :j=80 :k=90 :reps=3></week-item>
     <week-item :week=3 :h=50 :i=75 :j=85 :k=95 :reps=1></week-item>
-    <week-item :week=4 :h=60 :i=65 :j=75 :k=85 :reps=5></week-item>
-    <week-item :week=5 :h=60 :i=70 :j=80 :k=90 :reps=3></week-item>
-    <week-item :week=6 :h=60 :i=75 :j=85 :k=95 :reps=1></week-item>    
-    <week-item :week=7 :h=50 :i=40 :j=50 :k=60 :reps=5></week-item>       
+    <week-item :week=4 :h=60 :i=65 :j=75 :k=85 :reps=5 :second_week=true></week-item>
+    <week-item :week=5 :h=60 :i=70 :j=80 :k=90 :reps=3 :second_week=true></week-item>
+    <week-item :week=6 :h=60 :i=75 :j=85 :k=95 :reps=1 :second_week=true></week-item>    
+    <week-item :week=7 :h=50 :i=40 :j=50 :k=60 :reps=5 :second_week=true></week-item>       
   </div>
 </template>
 
@@ -82,12 +88,12 @@
 	  <td></td>
 	</tr>
 	<tr>
-	  <td>[[ overhead_press(i) ]]-[[ overhead_press(j) ]]-[[ overhead_press(k)]]</td>
+	  <td>[[ overhead_press(i, second_week) ]]-[[ overhead_press(j, second_week) ]]-[[ overhead_press(k, second_week)]]</td>
 	  <td></td>
-	  <td>[[ deadlift(i) ]]-[[ deadlift(j) ]]-[[ deadlift(k)]]</td>
+	  <td>[[ deadlift(i, second_week) ]]-[[ deadlift(j, second_week) ]]-[[ deadlift(k, second_week)]]</td>
 	  <td></td>
-	  <td>[[ bench_press(i) ]]-[[ bench_press(j) ]]-[[ bench_press(k)]]</td>	  
-	  <td>[[ squat(i) ]]-[[ squat(j) ]]-[[ squat(k)]]</td>	  
+	  <td>[[ bench_press(i, second_week) ]]-[[ bench_press(j, second_week) ]]-[[ bench_press(k, second_week)]]</td>	  
+	  <td>[[ squat(i, second_week) ]]-[[ squat(j, second_week) ]]-[[ squat(k, second_week)]]</td>	  
 	  <td></td>
 	</tr>
 	<tr>
@@ -100,12 +106,12 @@
 	  <td></td>
 	</tr>
 	<tr>
-	  <td>[[ bench_press(h) ]]</td>
+	  <td>[[ bench_press(h, second_week) ]]</td>
 	  <td></td>
-	  <td>[[ squat(h) ]]</td>
+	  <td>[[ squat(h, second_week) ]]</td>
 	  <td></td>
-	  <td>[[ overhead_press(h) ]]</td>
-	  <td>[[ deadlift(h) ]]</td>
+	  <td>[[ overhead_press(h, second_week) ]]</td>
+	  <td>[[ deadlift(h, second_week) ]]</td>
 	  <td></td>
 	</tr>
 	<tr>
@@ -124,23 +130,40 @@
 <script>
   const store = new Vuex.Store({
       state: {
+	  tms: [
+	      {% for t in tms %}
+	      {
+		  squat: '{{t.squat}}',
+		  deadlift: '{{t.deadlift}}',
+		  bench_press: '{{t.bench_press}}',
+		  overhead_press: '{{t.overhead_press}}',
+		  record_date: '{{t.record_date}}',
+	      },
+	      {% endfor %}
+	  ],
 	  tm: {
 	      squat: '{{tm.squat}}',
 	      deadlift: '{{tm.deadlift}}',
 	      bench_press: '{{tm.bench_press}}',
 	      overhead_press: '{{tm.overhead_press}}',
 	      record_date: '{{tm.record_date}}',
-	  }
+	  },
+	  tm2: {}
       }
   })
+
+  TmList = Vue.component('tm-list', {
+      template: '#tm-list-template',
+      data() {
+	  return {
+	      tms: store.state.tms
+	  }
+      }
+  });
   
   TmItem = Vue.component('tm-item', {
       template: '#tm-template',
-      data() {
-	  return {
-	      tm: store.state.tm,
-	  };
-      },
+      props: ['tm'],
       delimiters: ['[[', ']]'],
   });
 
@@ -151,29 +174,63 @@
   WeekItem = Vue.component('week-item', {
       template: '#week-item-template',
       delimiters: ['[[', ']]'],
-      props: ['h', 'i', 'j', 'k', 'reps', 'week'],
+      props: ['h', 'i', 'j', 'k', 'reps', 'week', 'second_week'],
       data () {
 	  return {
 	      tm: store.state.tm,
 	  };
       },
+      computed: {
+	  tm2: function() {
+	      return {
+		  squat: Number(store.state.tm.squat) + 10,
+		  deadlift: Number(store.state.tm.deadlift) + 10,
+		  overhead_press: Number(store.state.tm.overhead_press) + 5,
+		  bench_press: Number(store.state.tm.bench_press) + 5,
+	      }
+	  }
+      },
       methods: {
-	  overhead_press(param) {
-	      return this.tm.overhead_press * param/100
+	  overhead_press(param, second_week=false) {
+	      if (second_week) {
+		  return Math.ceil(this.tm2.overhead_press * param/100)
+	      }
+	      return Math.ceil(this.tm.overhead_press * param/100)
 	  },
-	  bench_press(param) {
-	      return this.tm.bench_press * param/100
+	  bench_press(param, second_week=false) {
+	      if (second_week) {
+		  return Math.ceil(this.tm2.bench_press * param/100)
+	      }
+	      return Math.ceil(this.tm.bench_press * param/100)
 	  },
-	  squat(param) {
-	      return this.tm.squat * param/100
+	  squat(param, second_week=false) {
+	      if (second_week) {
+		  return Math.ceil(this.tm2.squat * param/100)
+	      }
+	      return Math.ceil(this.tm.squat * param/100)
 	  },
-	  deadlift(param) {
+	  deadlift(param, second_week=false) {
+	      if (second_week) {
+		  return Math.ceil(this.tm2.deadlift * param/100)		  
+	      }
 	      return Math.ceil(this.tm.deadlift * param/100)
 	  },
       }
   })
 
-  const tmapp = new Vue({}).$mount('#bbb');
+  const routes = [
+      { path: '/workout', component: WeekList },
+      { path: '/tm', component: TmList }
+  ]
+  
+  const router = new VueRouter({
+      routes
+  })
+  
+  const tmapp = new Vue({
+      router,
+      store,
+  }).$mount('#bbb');
 </script>
 {% endblock %}
 

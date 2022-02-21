@@ -5,9 +5,11 @@ from .models import (
 )
 
 def tm(request):
+    tms = TrainingMax.objects.all()
     tm = TrainingMax.objects.first()
     data = {
-        'tm': tm,
+        'tms': tms,
+        'tm': tm
     }
     return render(request, 'bbb/index.html', data)
 
