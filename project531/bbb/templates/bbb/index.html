@@ -10,8 +10,7 @@
 
   <div class="bg-white container">
     <!-- Content -->
-    <router-link to="/tm">TM</router-link>
-    <router-link to="/workout">Workout</router-link>
+    <router-link to="/">Home Page</router-link>
     <router-view></router-view>
   </div>
 </div>
@@ -30,25 +29,46 @@
 	</tr>
       </thead>
       <tbody>
-	<tm-item v-for="(tm, i) in tms" :key="i" :tm="tm"></tm-item>
+	<tr v-for="(tm,i) in tms" :key=i>
+	  <th scope="row"><router-link :to="{ name: 'Workout', params: { tm } }">[[ tm.record_date ]]</router-link></th>
+	  <td>[[ tm.squat ]]</td>
+	  <td>[[ tm.deadlift ]]</td>
+	  <td>[[ tm.bench_press ]]</td>
+	  <td>[[ tm.overhead_press ]]</td>
+	</tr>	
       </tbody>    
   </div>
 </template>
 
-<template id="tm-template">
+<template id="tm-item-template">
   <div class="tm-item">
-    <tr>
-      <th scope="row">[[ tm.record_date ]]</th>
-      <td>[[ tm.squat ]]</td>
-      <td>[[ tm.deadlift ]]</td>
-      <td>[[ tm.bench_press ]]</td>
-      <td>[[ tm.overhead_press ]]</td>
-    </tr>
+    <table class="table table-striped my-5">
+      <thead>
+	<tr>
+	  <th scope="col"></th>	  
+	  <th scope="col">Squat</th>
+	  <th scope="col">Deadlift</th>
+	  <th scope="col">Bench Press</th>
+	  <th scope="col">Overhead Press</th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr>
+	  <td> [[ tm.record_date ]] </td>
+	  <td> [[ tm.squat ]] </td>
+	  <td> [[ tm.deadlift ]] </td>
+	  <td> [[ tm.bench_press ]] </td>
+	  <td> [[ tm.overhead_press ]] </td>
+	</tr>	
+      </tbody>      
+  </div>
 </template>
 
 <!-- Week List template -->
 <template id="week-list-template">
   <div class="week-list">
+    <div>[[ change(tm) ]]</div>
+    <tm-item :tm=tm></tm-item>
     <week-item :week=1 :h=50 :i=65 :j=75 :k=85 :reps=5></week-item>
     <week-item :week=2 :h=50 :i=70 :j=80 :k=90 :reps=3></week-item>
     <week-item :week=3 :h=50 :i=75 :j=85 :k=95 :reps=1></week-item>
@@ -56,7 +76,6 @@
     <week-item :week=5 :h=60 :i=70 :j=80 :k=90 :reps=3 :second_week=true></week-item>
     <week-item :week=6 :h=60 :i=75 :j=85 :k=95 :reps=1 :second_week=true></week-item>    
     <week-item :week=7 :h=50 :i=40 :j=50 :k=60 :reps=5 :second_week=true></week-item>       
-  </div>
 </template>
 
 
@@ -141,19 +160,20 @@
 	      },
 	      {% endfor %}
 	  ],
-	  tm: {
-	      squat: '{{tm.squat}}',
-	      deadlift: '{{tm.deadlift}}',
-	      bench_press: '{{tm.bench_press}}',
-	      overhead_press: '{{tm.overhead_press}}',
-	      record_date: '{{tm.record_date}}',
-	  },
+	  tm: {},
 	  tm2: {}
+      },
+      mutations: {
+	  change (state, tm) {
+	      state.tm = tm;
+	  }
       }
+      
   })
 
   TmList = Vue.component('tm-list', {
       template: '#tm-list-template',
+      delimiters: ['[[', ']]'],      
       data() {
 	  return {
 	      tms: store.state.tms
@@ -162,24 +182,26 @@
   });
   
   TmItem = Vue.component('tm-item', {
-      template: '#tm-template',
+      template: '#tm-item-template',
       props: ['tm'],
       delimiters: ['[[', ']]'],
   });
 
   WeekList = Vue.component('week-list', {
       template: '#week-list-template',
+      props: ['tm'],
+      delimiters: ['[[', ']]'],
+      methods: {
+	  change(param) {
+	      store.commit('change', param)
+	  }
+      }
   })
   
   WeekItem = Vue.component('week-item', {
       template: '#week-item-template',
       delimiters: ['[[', ']]'],
       props: ['h', 'i', 'j', 'k', 'reps', 'week', 'second_week'],
-      data () {
-	  return {
-	      tm: store.state.tm,
-	  };
-      },
       computed: {
 	  tm2: function() {
 	      return {
@@ -188,6 +210,9 @@
 		  overhead_press: Number(store.state.tm.overhead_press) + 5,
 		  bench_press: Number(store.state.tm.bench_press) + 5,
 	      }
+	  },
+	  tm: function() {
+	      return store.state.tm
 	  }
       },
       methods: {
@@ -219,9 +244,15 @@
   })
 
   const routes = [
-      { path: '/workout', component: WeekList },
-      { path: '/tm', component: TmList }
+      {
+	  path: '/workout',
+	  name: 'Workout',
+	  component: WeekList,
+	  props: true
+      },
+      { path: '/', component: TmList }      
   ]
+  
   
   const router = new VueRouter({
       routes
