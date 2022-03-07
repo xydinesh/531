@@ -5,7 +5,7 @@ from .models import (
 )
 
 def tm(request):
-    tms = TrainingMax.objects.all()
+    tms = TrainingMax.objects.all().order_by('-record_date')
     tm = TrainingMax.objects.first()
     data = {
         'tms': tms,
